@@ -7,13 +7,21 @@
 </head>
 
 <body>
-  <h1>Hi <span th:text="${name}"></span>!</h1>
-  じゃんけんポン！
-  <p>
+  <h1>Janken GAME!</h1>
 
-  </form>
-  </p>
+  <span th:if="${name}">
+    Hi <span th:text="${name}"></span><br>
+  </span>
 
+  <a href="/janken/play?userHand=Gu">ぐー</a>
+  <a href="/janken/play?userHand=Cho">ちょき</a>
+  <a href="/janken/play?userHand=Pa">ぱー</a>
+  
+  <div th:if="${userHand}">
+    あなたの手 <span th:text="${userHand}"></span><br>
+    相手の手 <span th:text="${cpuHand}"></span><br>
+    結果 <span th:text="${result}"></span><br>
+  </div>
 </body>
 
 </html>
