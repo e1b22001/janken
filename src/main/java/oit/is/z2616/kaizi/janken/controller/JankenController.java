@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import oit.is.z2616.kaizi.janken.model.Janken;
+
 @Controller
 @RequestMapping("/janken")
 
@@ -28,7 +30,8 @@ public class JankenController {
   // じゃんけんの手のリンクを押すと呼び出される
   @GetMapping("/play")
   public String play(@RequestParam String userHand, ModelMap model) {
-    String cpuHand = "Gu"; // 固定
+    Janken janken = new Janken("CPU");
+    String cpuHand = janken.randomCpuHand();
 
     String result = judgeJanken(userHand, cpuHand);
 

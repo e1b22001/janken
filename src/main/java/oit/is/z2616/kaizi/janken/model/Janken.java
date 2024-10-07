@@ -1,9 +1,11 @@
 package oit.is.z2616.kaizi.janken.model;
 
+import java.util.Random;
+
 public class Janken {
   String name;
   String userHand;
-  String cpuHand;
+  String cpuHand[] = { "Gu", "Cho", "Pa" };
   String result;
 
   public Janken(String name) {
@@ -26,12 +28,10 @@ public class Janken {
     this.userHand = userHand;
   }
 
-  public String getCpuHand() {
-    return cpuHand;
-  }
-
-  public void setCpuHand(String cpuHand) {
-    this.cpuHand = cpuHand;
+  public String randomCpuHand() {
+    Random random = new Random();
+    int index = random.nextInt(3);
+    return cpuHand[index];
   }
 
   public String getResult() {
