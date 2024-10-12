@@ -26,6 +26,7 @@ public class JankenController {
     String loginUser = prin.getName();
     this.entry.addUser(loginUser);
     model.addAttribute("entry", this.entry);
+    model.addAttribute("userCount", entry.getUsers().size());
 
     return "janken.html";
   }
