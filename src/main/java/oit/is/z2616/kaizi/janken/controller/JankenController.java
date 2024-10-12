@@ -1,29 +1,32 @@
 package oit.is.z2616.kaizi.janken.controller;
 
+import java.security.Principal;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z2616.kaizi.janken.model.Janken;
+import oit.is.z2616.kaizi.janken.model.Entry;
 
 @Controller
 @RequestMapping("/janken")
 
 public class JankenController {
 
-  // Janken GAME!に直接アクセスする
-  @GetMapping
-  public String janken() {
-    return "janken.html";
-  }
+  @Autowired
+  private Entry entry;
 
-  // index.htmlからユーザー名を入力すると、janken.htmlで「Hi ユーザー名」と表示される
-  @PostMapping
-  public String janken(@RequestParam String name, ModelMap model) {
-    model.addAttribute("name", name);
+  // ログイン後に呼び出される
+  @GetMapping
+  public String loginUser(Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    this.entry.addUser(loginUser);
+    model.addAttribute("entry", this.entry);
+
     return "janken.html";
   }
 

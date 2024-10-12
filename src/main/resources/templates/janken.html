@@ -7,16 +7,25 @@
 </head>
 
 <body>
+  <div><a href="/logout">ログアウト</a></div>
+
   <h1>Janken GAME!</h1>
 
-  <span th:if="${name}">
-    Hi <span th:text="${name}"></span><br>
-  </span>
+  <div th:if="${entry}">
+    <h2>エントリー</h2>
+    <ul>
+      <li th:each="user : ${entry.users}">[[${user}]]</li>
+    </ul>
+  </div>
+
+  <div th:if="${entry}">
+    Hi <span sec:authentication="name"></span><br>
+  </div>
 
   <a href="/janken/play?userHand=Gu">ぐー</a>
   <a href="/janken/play?userHand=Cho">ちょき</a>
   <a href="/janken/play?userHand=Pa">ぱー</a>
-  
+
   <div th:if="${userHand}">
     あなたの手 <span th:text="${userHand}"></span><br>
     相手の手 <span th:text="${cpuHand}"></span><br>
