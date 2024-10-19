@@ -22,6 +22,8 @@ public class JankenController {
 
   @Autowired
   private Entry entry;
+
+  @Autowired
   private UserMapper userMapper;
 
   // ログイン後に呼び出される
