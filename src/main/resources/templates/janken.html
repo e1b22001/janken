@@ -16,10 +16,23 @@
     <p>今<span th:text="${userCount}"></span>人がエントリーしています</p>
     <ul>
       <!--<li th:each="user : ${entry.users}">[[${user}]]</li>-->
-      <li th:each="user,stat:${users}">[[${user.name}]]</li>
+      <li th:each="user:${users}">[[${user.name}]]</li>
     </ul>
     Hi <span sec:authentication="name"></span><br>
   </div>
+
+  <p th:if="${matches}">
+    <h2>試合結果</h2>
+  <div th:each="match:${matches}">
+    <tr>
+      <td>id:[[${match.id}]]</td>
+      <td>user1:[[${match.user1}]]</td>
+      <td>user2:[[${match.user2}]]</td>
+      <td>user1の手:[[${match.user1Hand}]]</td>
+      <td>user2の手:[[${match.user2Hand}]]</td>
+    </tr>
+  </div>
+  </p>
 
   <a href="/janken/play?userHand=Gu">ぐー</a>
   <a href="/janken/play?userHand=Cho">ちょき</a>
