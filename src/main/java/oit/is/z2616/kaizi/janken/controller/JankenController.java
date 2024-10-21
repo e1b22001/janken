@@ -68,6 +68,7 @@ public class JankenController {
     String opponentHand = janken.randomCpuHand();
 
     String result = judgeJanken(userHand, opponentHand);
+    String winner = jankenWinner(result);
 
     // DBに登録
     Match match = new Match();
@@ -75,6 +76,7 @@ public class JankenController {
     match.setUser2(opponentId);
     match.setUser1Hand(userHand);
     match.setUser2Hand(opponentHand);
+    match.setWinner(winner);
     matchMapper.insertMatch(match);
 
     model.addAttribute("loginUser", loginUser);
@@ -83,23 +85,9 @@ public class JankenController {
     model.addAttribute("opponentHand", opponentHand);
     model.addAttribute("opponentId", opponentId);
     model.addAttribute("result", result);
+    model.addAttribute("winner", winner);
 
     return "match.html";
-  }
-
-  // じゃんけんの手のリンクを押すと呼び出される
-  @GetMapping("/janken/play")
-  public String play(@RequestParam String userHand, ModelMap model) {
-    Janken janken = new Janken("CPU");
-    String cpuHand = janken.randomCpuHand();
-
-    String result = judgeJanken(userHand, cpuHand);
-
-    model.addAttribute("userHand", userHand);
-    model.addAttribute("cpuHand", cpuHand);
-    model.addAttribute("result", result);
-
-    return "janken.html";
   }
 
   // じゃんけんの勝敗を決める
@@ -111,6 +99,17 @@ public class JankenController {
       return "You Win!";
     } else {
       return "You Lose...";
+    }
+  }
+
+  // じゃんけんの勝者を決める
+  private String jankenWinner(String result) {
+    if (result.contains("Win")) {
+      return "user1の勝利";
+    } else if (result.contains("Lose")) {
+      return "user2の勝利";
+    } else {
+      return "引き分け";
     }
   }
 

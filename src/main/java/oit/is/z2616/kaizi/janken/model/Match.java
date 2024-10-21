@@ -6,9 +6,16 @@ public class Match {
   int user2;
   String user1Hand;
   String user2Hand;
+  String winner;
 
   public int getId() {
     return id;
+  }
+  public String getWinner() {
+    return winner;
+  }
+  public void setWinner(String winner) {
+    this.winner = winner;
   }
   public void setId(int id) {
     this.id = id;
