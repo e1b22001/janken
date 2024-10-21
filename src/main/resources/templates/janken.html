@@ -11,16 +11,22 @@
 
   <h1>Janken GAME!</h1>
 
+  Hi <span sec:authentication="name"></span><br>
+
   <div th:if="${users}">
     <h2>エントリー</h2>
-    <p>今<span th:text="${userCount}"></span>人がエントリーしています</p>
-    <ul>
-      <!--<li th:each="user : ${entry.users}">[[${user}]]</li>-->
-      <li th:each="user : ${users}">
-        <a th:href="@{/match(id=${user.id})}"> [[${user.name}]]</a>
-      </li>
-    </ul>
-    Hi <span sec:authentication="name"></span><br>
+    <p>今<span th:text="${userCount}"></span>人がエントリーしています
+      <ul>
+        <li th:each="user : ${entry.users}">[[${user}]]</li>
+      </ul>
+    </p>
+    <p>対戦相手を選んでください
+      <ul>
+        <li th:each="user : ${users}">
+          <a th:href="@{/match(id=${user.id})}"> [[${user.name}]]</a>
+        </li>
+      </ul>
+    </p>
   </div>
 
   <p th:if="${matches}">
@@ -32,19 +38,11 @@
       <td>user2:[[${match.user2}]]</td>
       <td>user1の手:[[${match.user1Hand}]]</td>
       <td>user2の手:[[${match.user2Hand}]]</td>
+      <td><strong>[[${match.winner}]]</strong></td>
     </tr>
   </div>
   </p>
 
-  <a href="/janken/play?userHand=Gu">ぐー</a>
-  <a href="/janken/play?userHand=Cho">ちょき</a>
-  <a href="/janken/play?userHand=Pa">ぱー</a>
-
-  <div th:if="${userHand}">
-    あなたの手 <span th:text="${userHand}"></span><br>
-    相手の手 <span th:text="${cpuHand}"></span><br>
-    結果 <span th:text="${result}"></span><br>
-  </div>
 </body>
 
 </html>
