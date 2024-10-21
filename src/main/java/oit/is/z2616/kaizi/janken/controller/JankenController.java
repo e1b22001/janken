@@ -53,6 +53,36 @@ public class JankenController {
 
     model.addAttribute("loginUser", loginUser);
     model.addAttribute("opponent", opponent.getName());
+    model.addAttribute("opponentId", opponent.getId());
+
+    return "match.html";
+  }
+
+  @GetMapping("/match/fight")
+  public String fight(@RequestParam String userHand, @RequestParam Integer opponentId, Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    User user = userMapper.selectByName(loginUser);
+    User opponent = userMapper.selectById(opponentId);
+
+    Janken janken = new Janken(opponent.getName());
+    String opponentHand = janken.randomCpuHand();
+
+    String result = judgeJanken(userHand, opponentHand);
+
+    // DBに登録
+    Match match = new Match();
+    match.setUser1(user.getId());
+    match.setUser2(opponentId);
+    match.setUser1Hand(userHand);
+    match.setUser2Hand(opponentHand);
+    matchMapper.insertMatch(match);
+
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent.getName());
+    model.addAttribute("userHand", userHand);
+    model.addAttribute("opponentHand", opponentHand);
+    model.addAttribute("opponentId", opponentId);
+    model.addAttribute("result", result);
 
     return "match.html";
   }
@@ -76,7 +106,7 @@ public class JankenController {
   private String judgeJanken(String userHand, String cpuHand) {
     if (userHand.equals(cpuHand)) {
       return "Draw";
-    } else if (userHand.equals("Gu") && cpuHand.equals("Cho") || userHand.equals("Cho") && cpuHand.equals("Pa")
+    } else if (userHand.equals("Gu") && cpuHand.equals("Choki") || userHand.equals("Choki") && cpuHand.equals("Pa")
         || userHand.equals("Pa") && cpuHand.equals("Gu")) {
       return "You Win!";
     } else {
