@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z2616.kaizi.janken.model.Janken;
@@ -18,7 +17,6 @@ import oit.is.z2616.kaizi.janken.model.UserMapper;
 import oit.is.z2616.kaizi.janken.model.Entry;
 
 @Controller
-@RequestMapping("/janken")
 
 public class JankenController {
 
@@ -32,7 +30,7 @@ public class JankenController {
   private MatchMapper matchMapper;
 
   // ログイン後に呼び出される
-  @GetMapping
+  @GetMapping("/janken")
   public String loginUser(Principal prin, ModelMap model) {
     String loginUser = prin.getName();
     this.entry.addUser(loginUser);
@@ -47,8 +45,20 @@ public class JankenController {
     return "janken.html";
   }
 
+  // ユーザーをクリックすると呼び出される
+  @GetMapping("/match")
+  public String match(@RequestParam Integer id, Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    User opponent = userMapper.selectById(id);
+
+    model.addAttribute("loginUser", loginUser);
+    model.addAttribute("opponent", opponent.getName());
+
+    return "match.html";
+  }
+
   // じゃんけんの手のリンクを押すと呼び出される
-  @GetMapping("/play")
+  @GetMapping("/janken/play")
   public String play(@RequestParam String userHand, ModelMap model) {
     Janken janken = new Janken("CPU");
     String cpuHand = janken.randomCpuHand();
