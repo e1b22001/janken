@@ -5,7 +5,7 @@ import java.util.Random;
 public class Janken {
   String name;
   String userHand;
-  String cpuHand[] = { "Gu", "Cho", "Pa" };
+  String cpuHand[] = { "Gu", "Choki", "Pa" };
   String result;
 
   public Janken(String name) {
