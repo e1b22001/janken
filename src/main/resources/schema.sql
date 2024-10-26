@@ -10,3 +10,10 @@ CREATE TABLE matches (
     user2Hand VARCHAR NOT NULL,
     winner VARCHAR NOT NULL --追加
 );
+CREATE TABLE matchinfo (
+    id IDENTITY,
+    user1 INTEGER NOT NULL,
+    user2 INTEGER NOT NULL,
+    user1Hand VARCHAR NOT NULL,
+    isActive BOOLEAN DEFAULT FALSE
+)
