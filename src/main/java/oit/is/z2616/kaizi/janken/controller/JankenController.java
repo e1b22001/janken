@@ -40,9 +40,11 @@ public class JankenController {
     String loginUser = prin.getName();
     this.entry.addUser(loginUser);
     ArrayList<User> users = userMapper.selectAllUsers();
+    ArrayList<MatchInfo> matchInfos = matchInfoMapper.selectAllMatchInfos();
     ArrayList<Match> matches = matchMapper.selectAllMatches();
 
     model.addAttribute("users", users);
+    model.addAttribute("matchInfos", matchInfos);
     model.addAttribute("matches", matches);
     model.addAttribute("entry", this.entry);
     model.addAttribute("userCount", entry.getUsers().size());
