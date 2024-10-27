@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>じゃんけんCPU対戦画面</title>
+</head>
+
+<body>
+
+  <h2>CPUとの対戦</h2>
+
+  Hi <span th:text="${loginUser}"></span><br>
+
+  <p th:if="${match}">
+  <h2>試合結果</h2>
+  <div>
+    <tr>
+      <td>あなたの手:[[${userHand}]]</td><br>
+      <td>相手の手　:[[${cpuHand}]]</td><br>
+      <td>結果　　　:[[${result}]]</td><br>
+    </tr>
+  </div>
+  </p>
+
+  <a href="/janken">もどる</a>
+</body>
+
+</html>
