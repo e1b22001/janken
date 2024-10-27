@@ -63,6 +63,13 @@ public class JankenController {
     return "janken.html";
   }
 
+  @GetMapping("/matches/result")
+  public SseEmitter matchesResult() {
+    final SseEmitter sseEmitter = new SseEmitter();
+    this.asynckekka.asyncSendAllMatchesResults(sseEmitter);;
+    return sseEmitter;
+  }
+
   // ユーザーをクリックすると呼び出される
   @GetMapping("/match")
   public String match(@RequestParam Integer id, Principal prin, ModelMap model) {
@@ -109,6 +116,7 @@ public class JankenController {
       matchInfoMapper.deactivateMatchInfo(activeMatchInfo.getId());
 
       model.addAttribute("match", match);
+      model.addAttribute("id", match.getId());
     }
     model.addAttribute("loginUser", loginUser);
 

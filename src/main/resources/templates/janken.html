@@ -4,6 +4,32 @@
 <head>
   <meta charset="utf-8">
   <title>Janken</title>
+
+  <script>
+    window.onload = function () {
+      var sse = new EventSource('/matches/result');
+      sse.onmessage = function (event) {
+        console.log("sse.onmessage");
+        console.log(event.data);
+
+        var match_list = JSON.parse(event.data);
+        var match_text = "";
+
+        for (var i = 0; i < match_list.length; i++) {
+          var match = match_list[i];
+          match_text += "id:" + match.id +
+                       " user1:" + match.user1 +
+                       " user2:" + match.user2 +
+                       " user1Hand:" + match.user1Hand +
+                       " user2Hand:" + match.user2Hand +
+                       " <strong>" + match.winner + "</strong><br>";
+        }
+        console.log(match_text);
+        var resultDiv = document.getElementById("match_list");
+        resultDiv.innerHTML = match_text;
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -43,16 +69,7 @@
 
   <p th:if="${matches}">
     <h2>試合結果</h2>
-  <div th:each="match:${matches}">
-    <tr>
-      <td>id:[[${match.id}]]</td>
-      <td>user1:[[${match.user1}]]</td>
-      <td>user2:[[${match.user2}]]</td>
-      <td>user1の手:[[${match.user1Hand}]]</td>
-      <td>user2の手:[[${match.user2Hand}]]</td>
-      <td><strong>[[${match.winner}]]</strong></td>
-    </tr>
-  </div>
+    <div id="match_list"></div>
   </p>
 
 </body>
