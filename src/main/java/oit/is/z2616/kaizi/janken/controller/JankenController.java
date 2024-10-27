@@ -88,39 +88,62 @@ public class JankenController {
   public String fight(@RequestParam String userHand, @RequestParam Integer opponentId, Principal prin, ModelMap model) {
     String loginUser = prin.getName();
     User user = userMapper.selectByName(loginUser);
+    User opponent = userMapper.selectById(opponentId);
 
-    MatchInfo activeMatchInfo = matchInfoMapper.selectActiveMatchInfo(user.getId());
-    if (activeMatchInfo == null) {
-      MatchInfo matchInfo = new MatchInfo();
-
-      matchInfo.setUser1(user.getId());
-      matchInfo.setUser2(opponentId);
-      matchInfo.setUser1Hand(userHand);
-      matchInfo.setActive(true);
-      matchInfoMapper.insertMatchInfo(matchInfo);
-    } else {
-      String opponentHand = activeMatchInfo.getUser1Hand();
+    if (opponent.getName().equals("CPU")) {
+      Janken janken = new Janken(opponent.getName());
+      String cpuHand = janken.randomCpuHand();
+      String result = judgeJanken(userHand, cpuHand);
+      String winner = jankenWinner(result);
       Match match = new Match();
 
-      String result = judgeJanken(opponentHand, userHand);
-      String winner = jankenWinner(result);
-
-      match.setUser1(opponentId);
-      match.setUser2(user.getId());
-      match.setUser1Hand(opponentHand);
-      match.setUser2Hand(userHand);
+      match.setUser1(user.getId());
+      match.setUser2(opponentId);
+      match.setUser1Hand(userHand);
+      match.setUser2Hand(cpuHand);
       match.setActive(true);
       match.setWinner(winner);
       this.asynckekka.syncInsertMatch(match);
+      
+      model.addAttribute("loginUser", loginUser);
+      model.addAttribute("userHand", userHand);
+      model.addAttribute("cpuHand", cpuHand);
+      model.addAttribute("result", result);
 
-      matchInfoMapper.deactivateMatchInfo(activeMatchInfo.getId());
+      return "cpu.html";
+    } else {
+      MatchInfo activeMatchInfo = matchInfoMapper.selectActiveMatchInfo(user.getId());
+      if (activeMatchInfo == null) {
+        MatchInfo matchInfo = new MatchInfo();
 
-      model.addAttribute("match", match);
-      model.addAttribute("id", match.getId());
+        matchInfo.setUser1(user.getId());
+        matchInfo.setUser2(opponentId);
+        matchInfo.setUser1Hand(userHand);
+        matchInfo.setActive(true);
+        matchInfoMapper.insertMatchInfo(matchInfo);
+      } else {
+        String opponentHand = activeMatchInfo.getUser1Hand();
+        Match match = new Match();
+
+        String result = judgeJanken(opponentHand, userHand);
+        String winner = jankenWinner(result);
+
+        match.setUser1(opponentId);
+        match.setUser2(user.getId());
+        match.setUser1Hand(opponentHand);
+        match.setUser2Hand(userHand);
+        match.setActive(true);
+        match.setWinner(winner);
+        this.asynckekka.syncInsertMatch(match);
+
+        matchInfoMapper.deactivateMatchInfo(activeMatchInfo.getId());
+
+        model.addAttribute("match", match);
+      }
+      model.addAttribute("loginUser", loginUser);
+
+      return "wait.html";
     }
-    model.addAttribute("loginUser", loginUser);
-
-    return "wait.html";
   }
 
   @GetMapping("wait")
