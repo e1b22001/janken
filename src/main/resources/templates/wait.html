@@ -3,7 +3,32 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Janken</title>
+  <title>じゃんけん待機画面</title>
+
+  <script>
+    window.onload = function () {
+      var sse = new EventSource('/wait');
+      sse.onmessage = function (event) {
+        console.log("sse.onmessage");
+        console.log(event.data);
+
+        var match = JSON.parse(event.data);
+
+        var match_text = "Match:id " + match.id +
+                         " user1:" + match.user1 +
+                         " user2:" + match.user2 +
+                         " user1Hand:" + match.user1Hand +
+                         " user2Hand:" + match.user2Hand +
+                         " winner:" + match.winner;
+        console.log(match_text);
+        var resultDiv = document.getElementById("match_text");
+        resultDiv.innerHTML = match_text;
+        
+        document.getElementById("result_title").style.display = "block";
+        document.getElementById("janken").style.display = "block";
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -11,6 +36,10 @@
   <h2>相手の手を待ってます</h2>
 
   Hi <span th:text="${loginUser}"></span><br>
+
+  <h2 id="result_title" style="display:none;">結果</h2>
+  <div id="match_text"></div><br>
+  <a id="janken" href="/janken" style="display:none;">もどる</a>
 
 </body>
 
