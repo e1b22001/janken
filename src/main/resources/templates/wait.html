@@ -19,11 +19,11 @@
                          " user2:" + match.user2 +
                          " user1Hand:" + match.user1Hand +
                          " user2Hand:" + match.user2Hand +
-                         " winner:" + match.winner;
+                         " <strong>" + match.winner + "</strong>";
         console.log(match_text);
         var resultDiv = document.getElementById("match_text");
         resultDiv.innerHTML = match_text;
-        
+
         document.getElementById("result_title").style.display = "block";
         document.getElementById("janken").style.display = "block";
       }

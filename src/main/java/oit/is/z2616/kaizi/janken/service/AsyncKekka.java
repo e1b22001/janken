@@ -1,6 +1,6 @@
 package oit.is.z2616.kaizi.janken.service;
 
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -52,6 +52,28 @@ public class AsyncKekka {
       emitter.complete();
     }
     System.out.println("asyncSendMatchResult complete");
+  }
+
+  @Async
+  public void asyncSendAllMatchesResults(SseEmitter emitter) {
+    dbUpdated = true;
+    try {
+      while (true) {
+        if (false == dbUpdated) {
+          TimeUnit.MILLISECONDS.sleep(500);
+          continue;
+        }
+        ArrayList<Match> matches = matchMapper.selectAllMatches();
+        emitter.send(matches);
+        TimeUnit.MILLISECONDS.sleep(1000);
+        dbUpdated = false;
+      }
+    } catch (Exception e) {
+      logger.warn("Exception:" + e.getClass().getName() + ":" + e.getMessage());
+    } finally {
+      emitter.complete();
+    }
+    System.out.println("asyncSendAllMatchesResults complete");
   }
 
 }
