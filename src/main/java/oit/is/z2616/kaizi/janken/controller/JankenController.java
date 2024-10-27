@@ -5,9 +5,11 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import oit.is.z2616.kaizi.janken.model.Janken;
 import oit.is.z2616.kaizi.janken.model.Match;
@@ -17,6 +19,7 @@ import oit.is.z2616.kaizi.janken.model.MatchMapper;
 import oit.is.z2616.kaizi.janken.model.User;
 import oit.is.z2616.kaizi.janken.model.UserMapper;
 import oit.is.z2616.kaizi.janken.model.Entry;
+import oit.is.z2616.kaizi.janken.service.AsyncKekka;
 
 @Controller
 
@@ -34,6 +37,9 @@ public class JankenController {
   @Autowired
   private MatchInfoMapper matchInfoMapper;
 
+  @Autowired
+  private AsyncKekka asynckekka;
+
   // ログイン後に呼び出される
   @GetMapping("/janken")
   public String loginUser(Principal prin, ModelMap model) {
@@ -42,6 +48,11 @@ public class JankenController {
     ArrayList<User> users = userMapper.selectAllUsers();
     ArrayList<MatchInfo> matchInfos = matchInfoMapper.selectAllMatchInfos();
     ArrayList<Match> matches = matchMapper.selectAllMatches();
+
+    Match resetMatch = matchMapper.selectActiveMatch();
+    if (resetMatch != null && resetMatch.isActive()) {
+      matchMapper.deactivateMatches(resetMatch.getId());
+    }
 
     model.addAttribute("users", users);
     model.addAttribute("matchInfos", matchInfos);
@@ -64,59 +75,51 @@ public class JankenController {
 
     return "match.html";
   }
-/*
+
   @GetMapping("/match/fight")
+  @Transactional
   public String fight(@RequestParam String userHand, @RequestParam Integer opponentId, Principal prin, ModelMap model) {
     String loginUser = prin.getName();
     User user = userMapper.selectByName(loginUser);
-    User opponent = userMapper.selectById(opponentId);
 
-    Janken janken = new Janken(opponent.getName());
-    String opponentHand = janken.randomCpuHand();
+    MatchInfo activeMatchInfo = matchInfoMapper.selectActiveMatchInfo(user.getId());
+    if (activeMatchInfo == null) {
+      MatchInfo matchInfo = new MatchInfo();
 
-    String result = judgeJanken(userHand, opponentHand);
-    String winner = jankenWinner(result);
+      matchInfo.setUser1(user.getId());
+      matchInfo.setUser2(opponentId);
+      matchInfo.setUser1Hand(userHand);
+      matchInfo.setActive(true);
+      matchInfoMapper.insertMatchInfo(matchInfo);
+    } else {
+      String opponentHand = activeMatchInfo.getUser1Hand();
+      Match match = new Match();
 
-    // DBに登録
-    Match match = new Match();
-    match.setUser1(user.getId());
-    match.setUser2(opponentId);
-    match.setUser1Hand(userHand);
-    match.setUser2Hand(opponentHand);
-    match.setWinner(winner);
-    matchMapper.insertMatch(match);
+      String result = judgeJanken(opponentHand, userHand);
+      String winner = jankenWinner(result);
 
+      match.setUser1(opponentId);
+      match.setUser2(user.getId());
+      match.setUser1Hand(opponentHand);
+      match.setUser2Hand(userHand);
+      match.setActive(true);
+      match.setWinner(winner);
+      this.asynckekka.syncInsertMatch(match);
+
+      matchInfoMapper.deactivateMatchInfo(activeMatchInfo.getId());
+
+      model.addAttribute("match", match);
+    }
     model.addAttribute("loginUser", loginUser);
-    model.addAttribute("opponent", opponent.getName());
-    model.addAttribute("userHand", userHand);
-    model.addAttribute("opponentHand", opponentHand);
-    model.addAttribute("opponentId", opponentId);
-    model.addAttribute("result", result);
-    model.addAttribute("winner", winner);
-
-    return "match.html";
-  }
- */
-  @GetMapping("/match/wait")
-  public String wait(@RequestParam String userHand, @RequestParam Integer opponentId, Principal prin, ModelMap model) {
-    String loginUser = prin.getName();
-    User user = userMapper.selectByName(loginUser);
-    User opponent = userMapper.selectById(opponentId);
-
-    // DBに登録
-    MatchInfo matchInfo = new MatchInfo();
-    matchInfo.setUser1(user.getId());
-    matchInfo.setUser2(opponentId);
-    matchInfo.setUser1Hand(userHand);
-    matchInfo.setActive(true);
-    matchInfoMapper.insertMatchInfo(matchInfo);
-
-    model.addAttribute("loginUser", loginUser);
-    model.addAttribute("opponent", opponent.getName());
-    model.addAttribute("userHand", userHand);
-    model.addAttribute("opponentId", opponentId);
 
     return "wait.html";
+  }
+
+  @GetMapping("wait")
+  public SseEmitter waitKekka() {
+    final SseEmitter sseEmitter = new SseEmitter();
+    this.asynckekka.asyncSendMatchResult(sseEmitter);
+    return sseEmitter;
   }
 
   // じゃんけんの勝敗を決める

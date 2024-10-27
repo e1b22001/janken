@@ -6,6 +6,7 @@ public class Match {
   int user2;
   String user1Hand;
   String user2Hand;
+  boolean isActive;
   String winner;
 
   public int getId() {
@@ -44,5 +45,10 @@ public class Match {
   public void setUser2Hand(String user2Hand) {
     this.user2Hand = user2Hand;
   }
-
+  public boolean isActive() {
+    return isActive;
+  }
+  public void setActive(boolean isActive) {
+    this.isActive = isActive;
+  }
 }
